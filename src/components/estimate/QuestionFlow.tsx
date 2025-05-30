@@ -311,6 +311,9 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
       {step === 1 && (
         <div>
           <h2 className="text-2xl font-semibold mb-6 text-gray-800">Select Main Categories</h2>
+          {selectedCategories.length === 0 ? (
+            <div className="mb-6 text-gray-600">Select at least one main category to continue.</div>
+          ) : null}
           <div className="flex flex-wrap">
             {categories.map((cat) => (
               <Card
@@ -322,17 +325,19 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
               />
             ))}
           </div>
-          <button
-            className="mt-8 px-8 py-3 bg-primary-600 text-white rounded-xl font-medium shadow-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={selectedCategories.length === 0}
-            onClick={() => {
-              setStep(1.5);
-              setMainCatIdx(0);
-              setSubCatIdx(0);
-            }}
-          >
-            Next
-          </button>
+          <div className="flex justify-end">
+            <button
+              className="mt-8 px-8 py-3 bg-primary-600 text-white rounded-xl font-medium shadow-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={selectedCategories.length === 0}
+              onClick={() => {
+                setStep(1.5);
+                setMainCatIdx(0);
+                setSubCatIdx(0);
+              }}
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
       {step === 1.5 && (
@@ -371,12 +376,14 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
               </tbody>
             </table>
           </div>
-          <button
-            className="px-8 py-3 bg-primary-600 text-white rounded-xl font-medium shadow-md hover:bg-primary-700 transition-colors"
-            onClick={() => setStep(2)}
-          >
-            Next
-          </button>
+          <div className="flex justify-end">
+            <button
+              className="px-8 py-3 bg-primary-600 text-white rounded-xl font-medium shadow-md hover:bg-primary-700 transition-colors"
+              onClick={() => setStep(2)}
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
       {step === 2 && currentMainCat && (
@@ -450,7 +457,7 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
               );
             })}
           </div>
-          <div className="flex gap-4 mt-8">
+          <div className="flex justify-between items-center mt-8">
             <button
               className="px-8 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-200 transition-colors"
               onClick={() => {
@@ -488,12 +495,14 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
       {step === 3 && allAnswered && (
         <div>
           <h2 className="text-2xl font-semibold mb-6 text-gray-800">Review & Submit</h2>
-          <button
-            className="px-8 py-3 bg-primary-600 text-white rounded-xl font-medium shadow-md hover:bg-primary-700 transition-colors"
-            onClick={handleSubmit}
-          >
-            Submit
-          </button>
+          <div className="flex justify-end">
+            <button
+              className="px-8 py-3 bg-primary-600 text-white rounded-xl font-medium shadow-md hover:bg-primary-700 transition-colors"
+              onClick={handleSubmit}
+            >
+              Submit
+            </button>
+          </div>
         </div>
       )}
     </motion.div>

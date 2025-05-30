@@ -39,7 +39,7 @@ const CTA: React.FC<CTAProps> = ({ onGetEstimate }) => {
                 onClick={onGetEstimate}
                 className="bg-white text-primary-800 px-8 py-3 rounded-md font-medium flex items-center justify-center transition-all group"
               >
-                Get Your Estimate
+                Get Your Free Estimate
                 <ArrowRight size={18} className="ml-2 transition-transform group-hover:translate-x-1" />
               </motion.button>
               

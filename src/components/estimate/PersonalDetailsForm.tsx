@@ -19,6 +19,17 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({ onSubmit }) =
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // List of cities in Tamil Nadu (can be expanded)
+  const tamilNaduCities = [
+    'Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 
+    'Tirunelveli', 'Erode', 'Vellore', 'Thoothukudi', 'Dindigul',
+    'Thanjavur', 'Nagercoil', 'Cuddalore', 'Kanchipuram', 'Tiruppur',
+    'Karur', 'Udumalaipettai', 'Pollachi', 'Rajapalayam', 'Sivakasi'
+  ];
+
+  const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const updateDetail = (field: keyof PersonalDetails, value: string) => {
     setDetails((prev) => ({ ...prev, [field]: value }));
     
@@ -29,6 +40,20 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({ onSubmit }) =
         delete newErrors[field];
         return newErrors;
       });
+    }
+
+    // Filter city suggestions when typing in the city field
+    if (field === 'city') {
+      if (value.trim() === '') {
+        setCitySuggestions([]);
+        setShowSuggestions(false);
+      } else {
+        const filteredCities = tamilNaduCities.filter(city =>
+          city.toLowerCase().includes(value.toLowerCase())
+        );
+        setCitySuggestions(filteredCities);
+        setShowSuggestions(true);
+      }
     }
   };
   
@@ -180,7 +205,33 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({ onSubmit }) =
                 onChange={(e) => updateDetail('city', e.target.value)}
                 className={inputClasses('city')}
                 placeholder="Your city"
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
+                onFocus={() => {
+                  if (details.city.trim() !== '') {
+                     const filteredCities = tamilNaduCities.filter(city =>
+                       city.toLowerCase().includes(details.city.toLowerCase())
+                     );
+                     setCitySuggestions(filteredCities);
+                     setShowSuggestions(true);
+                  }
+                }}
               />
+              {showSuggestions && citySuggestions.length > 0 && (
+                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg">
+                  {citySuggestions.map((city, index) => (
+                    <li
+                      key={index}
+                      className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                      onMouseDown={() => {
+                        updateDetail('city', city);
+                        setShowSuggestions(false);
+                      }}
+                    >
+                      {city}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
             {errors.city && <p className="mt-1 text-sm text-red-500">{errors.city}</p>}
           </div>

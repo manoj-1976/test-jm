@@ -44,7 +44,7 @@ const Hero: React.FC<HeroProps> = ({ onGetEstimate }) => {
               onClick={onGetEstimate}
               className="bg-primary-600 hover:bg-primary-700 text-white px-12 py-5 rounded-lg font-bold text-2xl flex items-center justify-center transition-all shadow-lg"
             >
-              Get Your Estimate <ArrowRight size={28} className="ml-3" />
+              Get Your Free Estimate <ArrowRight size={28} className="ml-3" />
             </motion.button>
             
             <a 
