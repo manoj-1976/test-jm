@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { X } from 'lucide-react';
 
 const categories = ['All', 'Living Room', 'Kitchen', 'Bedroom', 'Office', 'Bathroom'];
@@ -63,10 +63,30 @@ const Gallery = () => {
     title: string;
     category: string;
   }>(null);
-
+  const [isPaused, setIsPaused] = useState(false);
+  const controls = useAnimation();
   const filteredItems = activeCategory === 'All' 
     ? galleryItems 
     : galleryItems.filter(item => item.category === activeCategory);
+
+  // Calculate total width to slide
+  const slideWidth = 320 * filteredItems.length;
+
+  useEffect(() => {
+    if (!isPaused) {
+      controls.start({
+        x: [0, -slideWidth],
+        transition: {
+          repeat: Infinity,
+          repeatType: 'loop',
+          duration: filteredItems.length * 2.5,
+          ease: 'linear',
+        },
+      });
+    } else {
+      controls.stop();
+    }
+  }, [isPaused, filteredItems.length, slideWidth, controls]);
 
   return (
     <section id="gallery" className="py-20 bg-white">
@@ -98,26 +118,26 @@ const Gallery = () => {
           ))}
         </div>
         
-        {/* Gallery Grid */}
-        <motion.div 
-          layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        {/* Gallery Carousel */}
+        <div
+          className="relative w-full overflow-hidden"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
         >
-          <AnimatePresence>
-            {filteredItems.map((item) => (
-              <motion.div
-                layout
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.4 }}
-                key={item.id}
-                className="group relative cursor-pointer overflow-hidden rounded-lg"
+          <motion.div
+            className="flex gap-6"
+            style={{ width: filteredItems.length * 320 }}
+            animate={controls}
+          >
+            {filteredItems.concat(filteredItems).map((item, idx) => (
+              <div
+                key={item.id + '-' + idx}
+                className="relative cursor-pointer overflow-hidden rounded-lg min-w-[300px] max-w-[320px] h-80 bg-gray-100 flex-shrink-0 group"
                 onClick={() => setSelectedImage(item)}
               >
-                <img 
-                  src={item.image} 
-                  alt={item.title} 
+                <img
+                  src={item.image}
+                  alt={item.title}
                   className="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -126,10 +146,10 @@ const Gallery = () => {
                     <p className="text-sm text-white/80">{item.category}</p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </AnimatePresence>
-        </motion.div>
+          </motion.div>
+        </div>
         
         {/* Lightbox */}
         <AnimatePresence>

@@ -43,13 +43,25 @@ const EstimateHeader: React.FC<EstimateHeaderProps> = ({ step }) => {
         {/* Progress Steps */}
         <div className="relative flex justify-center items-center max-w-3xl mx-auto mt-10">
           {/* Progress Bar */}
-          <div className="absolute top-7 left-0 h-0.5 bg-gray-300 w-full overflow-hidden rounded-full">
+          <div className="absolute top-7 left-0 w-[92%] mx-[4%] h-0.5 bg-gray-300 overflow-hidden rounded-full">
             <motion.div
-              className="h-full bg-primary-500"
+              className="h-full bg-primary-500 relative overflow-hidden"
               initial={{ width: 0 }}
               animate={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}
-              transition={{ duration: 0.6, type: 'tween', ease: 'easeInOut' }}
+              transition={{ duration: 0.8, type: 'tween', ease: 'easeInOut' }}
+            >
+              {/* Flow animation overlay */}
+              <motion.div
+                className="absolute top-0 left-0 h-full w-1/3 bg-gradient-to-r from-white/0 via-white/40 to-white/0 opacity-60 pointer-events-none"
+                initial={{ x: '-100%' }}
+                animate={{ x: '200%' }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1.5,
+                  ease: 'linear',
+                }}
             />
+            </motion.div>
           </div>
           
           {/* Steps */}
@@ -60,15 +72,15 @@ const EstimateHeader: React.FC<EstimateHeaderProps> = ({ step }) => {
               return (
                 <div key={s.id} className="flex flex-col items-center">
                   <motion.div
-                    className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
+                    className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors duration-300 border-2 ${
                       isActive 
-                        ? 'bg-primary-600 text-white border-primary-600 shadow-md' 
+                        ? 'bg-primary-600 text-white border-primary-600 shadow' 
                         : 'bg-gray-100 text-gray-500 border-gray-300'
                     }`}
-                    animate={isCurrentStep ? { scale: [1, 1.1, 1] } : { scale: 1 }}
-                    transition={isCurrentStep ? { duration: 0.8, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' } : { duration: 0.3 }}
+                    animate={isCurrentStep ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+                    transition={isCurrentStep ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.3 }}
                     style={{ 
-                      boxShadow: isCurrentStep ? '0 0 0 8px rgba(87, 119, 175, 0.3)' : 'none' 
+                      boxShadow: isCurrentStep ? '0 4px 12px rgba(0,0,0,0.1)' : 'none' 
                     }}
                   >
                     {s.icon}

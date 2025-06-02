@@ -247,25 +247,27 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
       const current = prev[catId] || [];
       const isSelected = current.includes(subcatId);
       let updated: Record<string, string[]>;
+
       if (isSelected) {
         // Deselect: remove from selected, clear product selection, deactivate
         updated = {
           ...prev,
           [catId]: current.filter((id) => id !== subcatId),
         };
-        setActiveSubcatId(null);
+        // Also remove the selected option if the subcategory is deselected
         setSelectedOptions((opts) => {
-          const newOpts = { ...opts };
-          delete newOpts[subcatId];
-          return newOpts;
+            const newOpts = { ...opts };
+            delete newOpts[subcatId];
+            return newOpts;
         });
+         setActiveSubcatId(null); // Deactivate on deselect
       } else {
         // Select: add to selected, activate
         updated = {
           ...prev,
           [catId]: [...current, subcatId],
         };
-        setActiveSubcatId(subcatId);
+        setActiveSubcatId(subcatId); // Activate on select
       }
       return updated;
     });
@@ -274,6 +276,7 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
   // Step 3: Select one option per subcategory
   const handleOptionSelect = (subcatId: string, optionId: string) => {
     setSelectedOptions((prev: Record<string, string>) => ({ ...prev, [subcatId]: optionId }));
+    setActiveSubcatId(null); // Deactivate after selecting an option
   };
   
   // Step 4: Complete and submit
@@ -403,8 +406,13 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
                   <div
                     className={`transition-all duration-300 ${isActive ? 'z-10' : ''} ${shouldBlur ? 'blur-sm opacity-50 pointer-events-none' : ''}`}
                     onClick={() => {
-                      if (isSelected) setActiveSubcatId(sub.id);
-                      else handleSubcategorySelect(currentMainCat.id, sub.id);
+                      // Toggle active state if already selected, otherwise select it
+                      if (isSelected) {
+                         if (isActive) setActiveSubcatId(null); // Deactivate if already active
+                         else setActiveSubcatId(sub.id); // Activate if not active but selected
+                      } else {
+                         handleSubcategorySelect(currentMainCat.id, sub.id);
+                      }
                     }}
                   >
                     <Card
@@ -414,8 +422,9 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
                       onClick={() => {}}
                     />
                   </div>
+                  {/* Show products if this subcategory is active and selected (even if already answered) */}
                   <AnimatePresence>
-                    {isActive && isSelected && !hasProduct && (
+                    {isActive && isSelected && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -432,20 +441,21 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
                             selected={selectedOptions[sub.id] === opt.id}
                             onClick={() => {
                               handleOptionSelect(sub.id, opt.id);
-                              setActiveSubcatId(null);
+                              // No need to deactivate here, handleOptionSelect does it
                             }}
                           />
                         ))}
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  {hasProduct && (
+                  {/* Show selected product name below subcategory if selected and not active*/}
+                  {hasProduct && !isActive && (
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                       className="text-white text-lg text-center mt-2 font-bold rounded-xl px-6 py-3 shadow-md"
-                      style={{ width: '75%', background: 'rgb(122, 44, 0)' }}
+                      style={{ width: '75%', background: 'rgb(163 120 86)' }}
                     >
                       {(() => {
                         const opt = optionsList.find(o => o.id === selectedOptions[sub.id]);
