@@ -1,69 +1,115 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
 interface HeroProps {
-  onGetEstimate: () => void;
+  // onGetEstimate: () => void;
 }
 
-const Hero: React.FC<HeroProps> = ({ onGetEstimate }) => {
+const Hero: React.FC<HeroProps> = ({ /* onGetEstimate */ }) => {
+  const words = ['Design', 'Manufacture', 'Innovate'];
+  const colors = ['#00BFFF', '#8A2BE2', '#FF4500']; // Blue, Purple, Orange/Red
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [displayedWord, setDisplayedWord] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const typingSpeed = 200; // Milliseconds per character
+  const deletingSpeed = 150; // Milliseconds per character
+  const delayBetweenWords = 1000; // Milliseconds to wait before typing next word
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout; // Explicitly type as NodeJS.Timeout
+
+    const handleTyping = () => {
+      const fullWord = words[currentWordIndex];
+      if (!isDeleting) {
+        setDisplayedWord(fullWord.substring(0, displayedWord.length + 1));
+        if (displayedWord.length === fullWord.length) {
+          setIsDeleting(true);
+          timeoutId = setTimeout(() => {}, delayBetweenWords); 
+        }
+      } else {
+        setDisplayedWord(fullWord.substring(0, displayedWord.length - 1));
+        if (displayedWord.length === 0) {
+          setIsDeleting(false);
+          setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
+        }
+      }
+    };
+
+    timeoutId = setTimeout(handleTyping, isDeleting ? deletingSpeed : typingSpeed);
+
+    return () => clearTimeout(timeoutId);
+  }, [displayedWord, isDeleting, currentWordIndex, words]);
+
   return (
-    <section className="relative h-screen flex items-center overflow-hidden">
+    <section className="relative h-screen flex flex-col justify-center items-center overflow-hidden">
       {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: 'url(https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1600)', 
-          filter: 'brightness(0.7)'
+          backgroundImage: 'url(https://images.pexels.com/photos/1743226/pexels-photo-1743226.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)', 
+          filter: 'brightness(0.5) blur(3px)'
         }}
       />
       
       {/* Content */}
-      <div className="container relative mx-auto px-4 z-10">
+      <div className="container relative mx-auto px-4 z-10 flex flex-col lg:flex-row items-center justify-between h-full">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="max-w-2xl text-white"
+          className="max-w-2xl text-white text-center"
         >
-          <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 leading-tight">
-            Transform Your Space with Premium Interior Design
-          </h1>
-          
-          <p className="text-lg md:text-xl opacity-90 mb-8 max-w-xl">
-            We create beautiful, functional spaces that reflect your personality and enhance your life. 
-            From concept to completion in under 45 days.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4">
-            <motion.button
-              animate={{ y: [0, -16, 0] }}
-              transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
-              whileHover={{ scale: 1.08, y: -24 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={onGetEstimate}
-              className="bg-primary-600 hover:bg-primary-700 text-white px-12 py-5 rounded-lg font-bold text-2xl flex items-center justify-center transition-all shadow-lg"
-            >
-              Get Your Free Estimate <ArrowRight size={28} className="ml-3" />
-            </motion.button>
-            
-            <a 
-              href="#gallery" 
-              className="border border-white/40 hover:bg-white/10 text-white px-8 py-3 rounded-md font-medium flex items-center justify-center transition-all"
-            >
-              View Our Work
-            </a>
+          <div className="flex items-end mb-4">
+            <h1 className="font-sans text-6xl md:text-7xl font-bold leading-none">
+              We
+            </h1>
+            <p className="font-sans text-lg md:text-xl text-white/70 ml-4 mb-3 max-w-xs">
+              are a bunch of wildly passionate young minds
+            </p>
           </div>
+          <h1 className="font-sans text-6xl md:text-7xl font-bold leading-none text-white">
+            {displayedWord}
+            <motion.span
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 0 }}
+              transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
+              className="inline-block w-3 h-8 bg-gray-300 relative"
+              style={{ height: '0.8em' }}
+            >
+              <div className="absolute w-2 h-2 bg-white rounded-full top-[-0.5rem] left-1/2 -translate-x-1/2"></div>
+            </motion.span>
+          </h1>
+        </motion.div>
+        
+        {/* Right Side Animated Element (Placeholder) */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="relative w-full lg:w-1/2 h-full flex items-center justify-center"
+        >
+          <motion.div 
+            key={currentWordIndex} // Key prop to re-trigger animation on word change
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full flex items-center justify-center overflow-hidden"
+            style={{ 
+              backgroundColor: colors[currentWordIndex], 
+              borderRadius: '500px 500px 500px 500px / 400px 400px 600px 600px' 
+            }}
+          >
+            {/* Character/Logo will go here */}
+          </motion.div>
         </motion.div>
       </div>
-      
-      {/* Decorative Element */}
-      <motion.div 
-        initial={{ width: 0 }}
-        animate={{ width: '50%' }}
-        transition={{ duration: 1, delay: 1, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute bottom-16 left-0 h-px bg-gradient-to-r from-white/0 via-white/60 to-white/0"
-      />
+
+      {/* Slogan Overlay */}
+      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-white text-3xl font-serif italic opacity-80">
+        “Designed for the Discerning Eye”
+      </div>
+
     </section>
   );
 };

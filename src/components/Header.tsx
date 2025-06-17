@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, color } from 'framer-motion';
 import Logo from './Logo';
 
 const NavItem = ({ href, label, isScrolled, isMobile = false, onClick = () => {} }: any) => {
