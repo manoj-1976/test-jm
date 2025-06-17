@@ -17,7 +17,7 @@ import poojaroom from '../../assects/pooja.jpg';
 import homeoffice from '../../assects/homeoffice.jpg';
 import balcony from '../../assects/balcony.jpg';
 // import commonarea from '../../assects/commonarea.jpg';
-import optionals from '../../assects/optionalS.jpg';
+import optionals from '../../assects/OptionalS.jpg';
 import guste from '../../assects/gustroom.jpg'
 
 // Placeholder image
