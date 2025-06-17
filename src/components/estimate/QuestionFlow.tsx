@@ -17,7 +17,7 @@ import poojaroom from '../../assects/pooja.jpg';
 import homeoffice from '../../assects/homeoffice.jpg';
 import balcony from '../../assects/balcony.jpg';
 // import commonarea from '../../assects/commonarea.jpg';
-import options from '../../assects/optionalS.jpg';
+import optionals from '../../assects/optionalS.jpg';
 import guste from '../../assects/gustroom.jpg'
 
 // Placeholder image
@@ -250,7 +250,7 @@ const categories: Category[] = [
   {
     id: 'optional-addons',
     name: 'Optional Add-Ons',
-    image: options,
+    image: optionals,
     subcategories: [
       { id: 'false-ceiling', name: 'False Ceiling (Wooden Design)', image: logo },
       { id: 'wooden-panelling', name: 'Wooden Wall Panelling / Fluted Panels', image: logo },
