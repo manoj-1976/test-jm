@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import videoSrc from '../assects/video.MOV';
+import landing from '../assects/landing.jpg'
+import { useNavigate } from 'react-router-dom';
 
 interface HeroProps {
   // onGetEstimate: () => void;
 }
 
 const Hero: React.FC<HeroProps> = ({ /* onGetEstimate */ }) => {
+  const navigate = useNavigate();
   const words = ['Design', 'Manufacture', 'Innovate'];
-  const colors = ['#00BFFF', '#8A2BE2', '#FF4500']; // Blue, Purple, Orange/Red
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+      const colors = ['#00BFFF', '#8A2BE2', '#FF4500']; // Blue, Purple, Orange/Red
+      const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [displayedWord, setDisplayedWord] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const typingSpeed = 200; // Milliseconds per character
@@ -42,33 +46,34 @@ const Hero: React.FC<HeroProps> = ({ /* onGetEstimate */ }) => {
   }, [displayedWord, isDeleting, currentWordIndex, words]);
 
   return (
-    <section className="relative h-screen flex flex-col justify-center items-center overflow-hidden">
+    <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden">
       {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: 'url(https://images.pexels.com/photos/1743226/pexels-photo-1743226.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)', 
+          backgroundImage: `url(${landing})`, 
           filter: 'brightness(0.5) blur(3px)'
         }}
       />
       
       {/* Content */}
-      <div className="container relative mx-auto px-4 z-10 flex flex-col lg:flex-row items-center justify-between h-full">
+      <div className="relative w-full px-2 sm:px-4 z-10 flex flex-col lg:flex-row items-center justify-between h-full">
+        {/* Left Side: Text */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="max-w-2xl text-white text-center"
+          className="w-full lg:w-1/2 flex flex-col items-center justify-center text-white text-center mb-2 lg:mb-0"
         >
-          <div className="flex items-end mb-4">
-            <h1 className="font-sans text-6xl md:text-7xl font-bold leading-none">
+          <div className="flex flex-col items-center justify-center mb-4">
+            <h1 className="font-sans text-4xl sm:text-5xl md:text-6xl font-bold leading-none">
               We
             </h1>
-            <p className="font-sans text-lg md:text-xl text-white/70 ml-4 mb-3 max-w-xs">
+            <p className="font-sans text-base sm:text-lg md:text-xl text-white/70 mt-2 max-w-xs">
               are a bunch of wildly passionate young minds
             </p>
           </div>
-          <h1 className="font-sans text-6xl md:text-7xl font-bold leading-none text-white">
+          <h1 className="font-sans text-4xl sm:text-5xl md:text-6xl font-bold leading-none text-white">
             {displayedWord}
             <motion.span
               initial={{ opacity: 1 }}
@@ -81,34 +86,30 @@ const Hero: React.FC<HeroProps> = ({ /* onGetEstimate */ }) => {
             </motion.span>
           </h1>
         </motion.div>
-        
-        {/* Right Side Animated Element (Placeholder) */}
+        {/* Right Side: Video */}
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="relative w-full lg:w-1/2 h-full flex items-center justify-center"
+          className="w-full flex items-center justify-center mt-4"
         >
-          <motion.div 
-            key={currentWordIndex} // Key prop to re-trigger animation on word change
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full flex items-center justify-center overflow-hidden"
-            style={{ 
-              backgroundColor: colors[currentWordIndex], 
-              borderRadius: '500px 500px 500px 500px / 400px 400px 600px 600px' 
-            }}
-          >
-            {/* Character/Logo will go here */}
-          </motion.div>
+          <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-lg">
+            <video
+              src={videoSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute top-0 left-0 w-full h-full object-cover"
+            />
+          </div>
         </motion.div>
       </div>
 
       {/* Slogan Overlay */}
-      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-white text-3xl font-serif italic opacity-80">
+      {/* <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-white text-3xl font-serif italic opacity-80">
         “Designed for the Discerning Eye”
-      </div>
+      </div> */}
 
     </section>
   );

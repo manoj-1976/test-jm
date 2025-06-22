@@ -24,5 +24,6 @@ export default defineConfig({
         report-uri /api/report-csp-violation;
       `.replace(/\s+/g, ' ').trim()
     }
-  }
+  },
+  assetsInclude: ['**/*.MOV'],
 });
