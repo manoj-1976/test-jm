@@ -16,7 +16,7 @@ import utilityarea from '../../assects/utility.jpg';
 import poojaroom from '../../assects/pooja.jpg';
 import homeoffice from '../../assects/homeoffice.jpg';
 import balcony from '../../assects/balcony.jpg';
-import options from '../../assects/optionalS.jpg';
+import options from '../../assects/OptionalS.jpg';
 import guste from '../../assects/gustroom.jpg';
 import door3 from '../../assects/door3.jpg';
 import door1 from '../../assects/door1.jpg';
