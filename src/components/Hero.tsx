@@ -1,35 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import videoSrc from '../assects/video.MOV';
-import landing from '../assects/landing.jpg'
-import { useNavigate } from 'react-router-dom';
+import { useInView } from 'react-intersection-observer';
 
-interface HeroProps {
-  // onGetEstimate: () => void;
-}
-
-const Hero: React.FC<HeroProps> = ({ /* onGetEstimate */ }) => {
+const Hero: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const words = ['Design', 'Manufacture', 'Innovate'];
-      const colors = ['#00BFFF', '#8A2BE2', '#FF4500']; // Blue, Purple, Orange/Red
-      const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [displayedWord, setDisplayedWord] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const typingSpeed = 200; // Milliseconds per character
-  const deletingSpeed = 150; // Milliseconds per character
-  const delayBetweenWords = 1000; // Milliseconds to wait before typing next word
+  const typingSpeed = 200;
+  const deletingSpeed = 150;
+  const delayBetweenWords = 1000;
+  const [expCount, setExpCount] = useState(0);
+  const [projCount, setProjCount] = useState(0);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout; // Explicitly type as NodeJS.Timeout
-
+    let timeoutId: NodeJS.Timeout;
     const handleTyping = () => {
       const fullWord = words[currentWordIndex];
       if (!isDeleting) {
         setDisplayedWord(fullWord.substring(0, displayedWord.length + 1));
         if (displayedWord.length === fullWord.length) {
           setIsDeleting(true);
-          timeoutId = setTimeout(() => {}, delayBetweenWords); 
+          timeoutId = setTimeout(() => {}, delayBetweenWords);
         }
       } else {
         setDisplayedWord(fullWord.substring(0, displayedWord.length - 1));
@@ -39,78 +35,107 @@ const Hero: React.FC<HeroProps> = ({ /* onGetEstimate */ }) => {
         }
       }
     };
-
     timeoutId = setTimeout(handleTyping, isDeleting ? deletingSpeed : typingSpeed);
-
     return () => clearTimeout(timeoutId);
   }, [displayedWord, isDeleting, currentWordIndex, words]);
 
+  useEffect(() => {
+    setExpCount(0);
+    setProjCount(0);
+    let expInterval: NodeJS.Timeout;
+    let projInterval: NodeJS.Timeout;
+
+    expInterval = setInterval(() => {
+      setExpCount((prev) => {
+        if (prev < 10) return prev + 1;
+        clearInterval(expInterval);
+        return 10;
+      });
+    }, 120);
+
+    projInterval = setInterval(() => {
+      setProjCount((prev) => {
+        if (prev < 150) return prev + 5;
+        clearInterval(projInterval);
+        return 150;
+      });
+    }, 30);
+
+    return () => {
+      clearInterval(expInterval);
+      clearInterval(projInterval);
+    };
+  }, [location.pathname]);
+
   return (
-    <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
-          backgroundImage: `url(${landing})`, 
-          filter: 'brightness(0.5) blur(3px)'
-        }}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Video Background */}
+      <video
+        src={videoSrc}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover z-0"
       />
-      
-      {/* Content */}
-      <div className="relative w-full px-2 sm:px-4 z-10 flex flex-col lg:flex-row items-center justify-between h-full">
-        {/* Left Side: Text */}
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
+      {/* Overlay for contrast */}
+      <div className="absolute inset-0 bg-black/50 z-10" />
+      {/* Centered Content */}
+      <div className="relative z-20 flex flex-col items-center justify-center w-full px-4 text-center">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="w-full lg:w-1/2 flex flex-col items-center justify-center text-white text-center mb-2 lg:mb-0"
+          className="font-sans text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-2 drop-shadow-2xl"
         >
-          <div className="flex flex-col items-center justify-center mb-4">
-            <h1 className="font-sans text-4xl sm:text-5xl md:text-6xl font-bold leading-none">
-              We
-            </h1>
-            <p className="font-sans text-base sm:text-lg md:text-xl text-white/70 mt-2 max-w-xs">
-              are a bunch of wildly passionate young minds
-            </p>
-          </div>
-          <h1 className="font-sans text-4xl sm:text-5xl md:text-6xl font-bold leading-none text-white">
-            {displayedWord}
-            <motion.span
-              initial={{ opacity: 1 }}
-              animate={{ opacity: 0 }}
-              transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
-              className="inline-block w-3 h-8 bg-gray-300 relative"
-              style={{ height: '0.8em' }}
-            >
-              <div className="absolute w-2 h-2 bg-white rounded-full top-[-0.5rem] left-1/2 -translate-x-1/2"></div>
-            </motion.span>
-          </h1>
-        </motion.div>
-        {/* Right Side: Video */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
+          We
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="w-full flex items-center justify-center mt-4"
+          className="font-sans text-base sm:text-lg md:text-xl text-white/80 mb-6 max-w-xl drop-shadow-2xl"
         >
-          <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-lg">
-            <video
-              src={videoSrc}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute top-0 left-0 w-full h-full object-cover"
-            />
+          are a bunch of wildly passionate young minds
+        </motion.p>
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-8 h-16 flex items-center justify-center drop-shadow-2xl"
+        >
+          {displayedWord}
+          <motion.span
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={{ repeat: Infinity, duration: 0.8, ease: 'easeInOut' }}
+            className="inline-block w-1 h-8 bg-white ml-1 align-bottom"
+            style={{ height: '0.8em' }}
+          />
+        </motion.h2>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => navigate('/estimate')}
+          className="px-8 py-3 rounded-full bg-yellow-600 text-white font-semibold text-lg shadow-lg hover:bg-yellow-700 transition mb-4"
+        >
+          Get Estimate
+        </motion.button>
+        <div className="mt-8 grid grid-cols-2 gap-6 max-w-md mx-auto w-full">
+          <div className="bg-black/40 p-4 rounded-lg text-center">
+            <span className="block text-3xl font-semibold text-white mb-1 flex justify-center">
+              {expCount}+
+            </span>
+            <span className="text-white text-sm">Years Experience</span>
           </div>
-        </motion.div>
+          <div className="bg-black/40 p-4 rounded-lg text-center">
+            <span className="block text-3xl font-semibold text-white mb-1 flex justify-center">
+              {projCount}+
+            </span>
+            <span className="text-white text-sm">Projects Completed</span>
+          </div>
+        </div>
       </div>
-
-      {/* Slogan Overlay */}
-      {/* <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-white text-3xl font-serif italic opacity-80">
-        “Designed for the Discerning Eye”
-      </div> */}
-
     </section>
   );
 };

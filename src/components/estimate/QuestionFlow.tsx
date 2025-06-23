@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AnswerData } from '../../pages/EstimatePage';
 import logo from '../../assects/logo.png';
 import { CheckCircle, X as XIcon } from 'lucide-react';
-import { useGoogleApi } from '../../utils/googleApi';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import livingroom from '../../assects/livingroom.jpg';
@@ -307,7 +306,7 @@ const categories: Category[] = [
         { id: 'study-parent-standard', name: 'Standard', price: 42500, image: study2, dimensions: `(60" (W) x 84" (H) = 35 sq ft)`},
         { id: 'study-parent-premium', name: 'Premium', price: 66400, image: study3, dimensions: `(84" (W) x 96" (H) = 56 sq ft)`},
       ] },
-      // { id: 'bookshelf', name: 'Bookshelf / Wall Shelf', image: logo },
+      // { id: 'bookshelf', name: 'Bookshelf / Wall Shelf', image: logo },image.png
       { id: 'mini-tv-unit', name: 'Mini TV Unit', image: mini3, options: [
         { id: 'mini-parent-basic', name: 'Basic', price: 16700, image: mini1, dimensions: `(48" (W) x 60" (H) = 20 sq ft)`},
         { id: 'mini-parent-standard', name: 'Standard', price: 32600, image: mini2, dimensions: `(48" (W) x 72" (H) = 24 sq ft)`},
@@ -572,13 +571,6 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<Record<string, string[]>>({});
   const [selectedOptions, setSelectedOptions] = useState<Record<string, Record<string, string>>>({});
-  const [personalDetails, setPersonalDetails] = useState<PersonalDetails>({
-    fullName: '',
-    email: '',
-    phone: '',
-    city: '',
-    address: ''
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Wizard state
@@ -586,23 +578,6 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
   const [subCatIdx, setSubCatIdx] = useState(0);
   const [activeSubcatId, setActiveSubcatId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const { isInitializing, error, saveDataToSheet, uploadPdfToDrive } = useGoogleApi();
-
-  useEffect(() => {
-    if (isInitializing) {
-      console.log('Google API is initializing...');
-    } else if (error) {
-      console.error('Google API initialization error:', error);
-    }
-  }, [isInitializing, error]);
-
-  // Scroll to top of QuestionFlow on step change
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [step]);
 
   // Step 1: Select main categories
   const handleCategorySelect = (catId: string) => {
@@ -657,88 +632,9 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
     setActiveSubcatId(null);
   };
   
-  // Step 4: Personal details form
-  const handlePersonalDetailsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setPersonalDetails(prev => ({ ...prev, [name]: value }));
-  };
-
-  const renderPersonalDetailsForm = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-    >
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">Your Details</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <input
-          type="text"
-          name="fullName"
-          placeholder="Full Name" 
-          value={personalDetails.fullName}
-          onChange={handlePersonalDetailsChange}
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400" 
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email Address"
-          value={personalDetails.email}
-          onChange={handlePersonalDetailsChange}
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400"
-          required
-        />
-        <input
-          type="tel"
-          name="phone"
-          placeholder="Phone Number"
-          value={personalDetails.phone}
-          onChange={handlePersonalDetailsChange}
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400"
-          required
-        />
-        <input
-          type="text"
-          name="city"
-          placeholder="City"
-          value={personalDetails.city}
-          onChange={handlePersonalDetailsChange}
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400"
-          required
-        />
-      </div>
-      <textarea
-        name="address"
-        placeholder="Full Address"
-        value={personalDetails.address}
-        onChange={handlePersonalDetailsChange}
-        rows={3}
-        className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 md:col-span-2"
-        required
-      />
-      <div className="flex justify-between items-center mt-8">
-        <button
-          className="px-8 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-200 transition-colors"
-          onClick={() => setStep(2)}
-        >
-          Back
-        </button>
-        <button
-          className="px-8 py-3 bg-primary-600 text-white rounded-xl font-medium shadow-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!personalDetails.fullName || !personalDetails.email || !personalDetails.phone || !personalDetails.city || !personalDetails.address}
-          onClick={() => setStep(4)}
-        >
-          Review & Submit
-        </button>
-      </div>
-    </motion.div>
-  );
-
-  // Step 5: Complete and submit
+  // Step 4: Complete and submit
   const handleSubmit = async () => {
-    if (isSubmitting || isInitializing) return; // Prevent multiple submissions or submission while API is initializing
+    if (isSubmitting) return; // Prevent multiple submissions
     setIsSubmitting(true);
 
     try {
@@ -771,14 +667,6 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
       const pdfContent = `
         <div style="padding: 40px; font-family: Arial, sans-serif;">
           <h2>Quotation Details</h2>
-          <div>
-            <h3>Personal Information:</h3>
-            <p>Name: ${personalDetails.fullName}</p>
-            <p>Email: ${personalDetails.email}</p>
-            <p>Phone: ${personalDetails.phone}</p>
-            <p>City: ${personalDetails.city}</p>
-            <p>Address: ${personalDetails.address}</p>
-          </div>
           <div>
             <h3>Selected Items:</h3>
             ${answers.map(answer => `
@@ -813,32 +701,14 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
         // Convert PDF to Blob
         const pdfBlob = pdf.output('blob');
 
-        // Upload PDF to Google Drive and get link
-        const driveResponse = await uploadPdfToDrive(pdfBlob, `Quotation_${personalDetails.fullName}_${Date.now()}.pdf`);
-        const driveLink = driveResponse.webViewLink || `https://drive.google.com/file/d/${driveResponse.id}/view`;
-
-        // Save data to Google Sheet
-        const rowData = [
-          new Date().toISOString(),
-          personalDetails.fullName,
-          personalDetails.email,
-          personalDetails.phone,
-          personalDetails.city,
-          personalDetails.address,
-          JSON.stringify(answers),
-          total.toString(),
-          driveLink
-        ];
-        await saveDataToSheet('details!A:I', [rowData]);
-
         // Clean up
         document.body.removeChild(tempDiv);
         
         // Call onComplete only after successful save
         onComplete(answers, total);
       } catch (error) {
-        console.error('Error in PDF generation or Google API operations:', error);
-        throw new Error('Failed to generate PDF or save to Google services.');
+        console.error('Error in PDF generation:', error);
+        throw new Error('Failed to generate PDF.');
       }
     } catch (error) {
       console.error('Error submitting estimate:', error);
@@ -1091,8 +961,7 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
           </div>
         </div>
       )}
-      {step === 3 && allAnswered && renderPersonalDetailsForm()}
-      {step === 4 && allAnswered && (
+      {step === 3 && allAnswered && (
         <div>
           <h2 className="text-2xl font-semibold mb-6 text-gray-800">Review & Submit</h2>
           <div className="flex justify-end">
@@ -1101,15 +970,15 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
                 isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-700'
               }`}
               onClick={handleSubmit}
-              disabled={isSubmitting || isInitializing}
+              disabled={isSubmitting}
             >
-              {isSubmitting || isInitializing ? (
+              {isSubmitting ? (
                 <span className="flex items-center">
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  {isInitializing ? 'Initializing API...' : 'Submitting...'}
+                  'Submitting...'
                 </span>
               ) : (
                 'Submit'
