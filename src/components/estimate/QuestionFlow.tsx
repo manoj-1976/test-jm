@@ -89,9 +89,38 @@ import toy3 from '../../assects/toy3.jpg';
 import kidsstudy1 from '../../assects/kidsstudy1.jpg';
 import kidsstudy2 from '../../assects/kidsstudy2.jpg';
 import kidsstudy3 from '../../assects/kidsstudy3.jpg';
+import cabinet1 from '../../assects/cabinet1.jpg';
+import cabinet2 from '../../assects/cabinet2.jpg';
+import cabinet3 from '../../assects/cabinet3.jpg';
+import pantry1 from '../../assects/pantry1.jpg';
+import cutlery1 from '../../assects/cutlery1.jpg';
+import cup1 from '../../assects/cup1.jpg';
+import bottle1 from '../../assects/bottel1.jpg';
+import plate1 from '../../assects/plate1.jpg';
+import swing1 from '../../assects/swing1.jpg';
+import roll1 from '../../assects/roller1.jpg';
+import dustbin1 from '../../assects/dustbin1.jpg';
+import wicker1 from '../../assects/wicker1.jpg';
+import utility1 from '../../assects/utility1.jpg';
+import utility2 from '../../assects/utility2.jpg';
+import utility3 from '../../assects/utility3.jpg';
+import ceiling1 from '../../assects/ceiling1.jpg';
+import ceiling2 from '../../assects/ceiling2.jpg';
+import ceiling3 from '../../assects/ceiling3.jpg';
+import curtains1 from '../../assects/curtains1.jpg';
+import curtains2 from '../../assects/curtains2.jpg';
+import curtains3 from '../../assects/curtains3.jpg';
+import mirror1 from '../../assects/mirror1.jpg';
+import mirror2 from '../../assects/mirror2.jpg';
+import mirror3 from '../../assects/mirror3.jpg';
+import wallpaper1 from '../../assects/wallpaper1.jpg';
+import wallpaper2 from '../../assects/wallpaper2.jpg';
+import wallpaper3 from '../../assects/wallpaper3.jpg';
+
+
 
 // Placeholder image
-// const placeholderImg = 'https://via.placeholder.com/100?text=Image';
+// const placeholderImg = 'https://via.placeholder.com/100?text=Image'; mk
 
 interface Option {
   id: string;
@@ -270,7 +299,7 @@ const categories: Category[] = [
       //   { id: 'walk-in-premium', name: 'Premium', price: 62800, image: pooja3, dimensions: `(72" (W) x 96" (H) = 48 sq ft)`},
       // ] },
     ],
-  },
+  },  
   {
     id: 'parents-bedroom',
     name: `Parent's bedroom`,
@@ -419,29 +448,68 @@ const categories: Category[] = [
     name: 'Kitchen',
     image: kitchen,
     subcategories: [
-      { id: 'base-cabinets', name: 'Base Cabinets', image: logo },
-      { id: 'wall-cabinets', name: 'Wall Cabinets', image: logo },
-      { id: 'tall-unit', name: 'Tall Unit / Pantry Unit', image: logo },
-      { id: 'microwave-unit', name: 'Microwave Unit', image: logo },
-      { id: 'cutlery-pullout', name: 'Cutlery / Bottle Pull-out Unit', image: logo },
-      { id: 'corner-carousel', name: 'Corner Carousel / Magic Corner', image: logo },
-      { id: 'wicker-basket', name: 'Wicker Basket Unit', image: logo },
-      { id: 'loft-shutters', name: 'Loft Shutters', image: logo },
-      { id: 'under-sink', name: 'Under-sink Unit', image: logo },
-      { id: 'chimney-duct', name: 'Chimney Duct Cover Box', image: logo },
+      { id: 'base-cabinets', name: 'Base And Wall Cabinets', image: cabinet3, options: [
+        { id: 'cabinets-basic', name: 'Basic', price: 159940, image: cabinet1, dimensions: `(240" (W) x 60" (H) = 100 sq ft)`},
+        { id: 'cabinets-standard', name: 'Standard', price: 198800, image: cabinet2, dimensions: `(240" (W) x 60" (H) = 100 sq ft)`},
+        { id: 'cabinets-premium', name: 'Premium', price: 248700, image: cabinet3, dimensions: `(240" (W) x 60" (H) = 100 sq ft)`},
+      ] },
+      { id: 'loft-kitchen-unit', name: 'Loft',  image: loft3, options: [
+        { id: 'loft-kitchen-basic', name: 'Basic', price: 30000, image: loft1, dimensions: `(120" (W) x 36" (H) = 30 sq ft)`},
+        { id: 'loft-kitchen-standard', name: 'Standard', price: 36000, image: loft2, dimensions: `(120" (W) x 36" (H) = 30 sq ft)`},
+        { id: 'loft-kitchen-premium', name: 'Premium', price: 42000, image: loft3, dimensions: `(120" (W) x 36" (H) = 30 sq ft)`},
+      ] },
+      // { id: 'wall-cabinets', name: 'Wall Cabinets', image: logo }, 
+      { id: 'tall-unit', name: 'Pantry Unit', image: pantry1, options: [
+        { id: 'tall-basic', name: 'Glass Pantry', price: 23500, image: pantry1, dimensions: `(24" (W) x 84" (H) = 14 sq ft)`},
+      ] },
+      { id: 'cutlery', name: 'Cutlery Tandem', image: cutlery1, options: [
+        { id: 'cutlery-basic', name: 'Cutlery Tandem', price: 4950, image: cutlery1, dimensions: `(36" (W) x 12" (H) = 3 sq ft)`},
+      ] },
+      { id: 'cup-saucer', name: 'Cup & Saucer Tandem', image: cup1, options: [
+        { id: 'cup-saucer-basic', name: 'Cup & Saucer', price: 4950, image: cup1, dimensions: `(36" (W) x 12" (H) = 3 sq ft)`},
+      ] },
+      { id: 'plate-tandem', name: 'Plate Tandem', image: plate1, options: [
+        { id: 'plate-basic', name: 'Plate Tandem', price: 4950, image: plate1, dimensions: `(36" (W) x 12" (H) = 3 sq ft)`},
+      ] },
+      { id: 'oil-bottle', name: 'Oil Bottle Pullout', image: bottle1, options: [
+        { id: 'oil-bottle-basic', name: 'Oil Bottle', price: 4950, image: bottle1, dimensions: `(36" (W) x 12" (H) = 3 sq ft)`},
+      ] },
+      { id: 'swing-tray', name: 'Swing Tray', image: swing1, options: [
+        { id: 'swing-basic', name: 'Swing Tray', price: 22500, image: swing1, dimensions: `(48" (W) x 24" (H) = 8 sq ft)`},
+      ] },
+      { id: 'roller-shutter', name: 'Roller Shutter', image: roll1, options: [
+        { id: 'cabinets-basic', name: 'Roller Shutter', price: 22500, image: roll1, dimensions: `(24" (W) x 48" (H) = 8 sq ft)`},
+      ] },
+      { id: 'wicker-basket', name: 'Wicker Basket', image: wicker1, options: [
+        { id: 'wicker-basic', name: '3 Wicker Basket', price: 7800, image: wicker1, dimensions: `(24" (W) x 24" (H) = 4 sq ft)`},
+      ] },
+      { id: 'dust-bin', name: 'Dust Bin', image: dustbin1, options: [
+        { id: 'dust-bin-basic', name: 'Dust Bin', price: 3800, image: dustbin1, dimensions: `(12" (W) x 24" (H) = 2 sq ft)`},
+      ] },
+      
+      // { id: 'microwave-unit', name: 'Microwave Unit', image: logo },
+      // { id: 'cutlery-pullout', name: ' / Bottle Pull-out Unit', image: logo },
+      // { id: 'corner-carousel', name: 'Corner Carousel / Magic Corner', image: logo },
+      // { id: 'wicker-basket', name: 'Wicker Basket Unit', image: logo },
+      // { id: 'loft-shutters', name: 'Loft Shutters', image: logo },
+      // { id: 'under-sink', name: 'Under-sink Unit', image: logo },
+      // { id: 'chimney-duct', name: 'Chimney Duct Cover Box', image: logo },
     ],
   },
+
   {
     id: 'utility-area',
     name: 'Utility Area',
     image: utilityarea,
     subcategories: [
-      { id: 'washing-machine-cabinet', name: 'Washing Machine Cabinet', image: logo },
-      { id: 'sink-counter', name: 'Sink Counter Unit', image: logo },
-      { id: 'storage-shelves', name: 'Storage Shelves / Cleaning Storage', image: logo },
-      { id: 'ironing-board', name: 'Ironing Board Unit (foldable)', image: logo },
-    ],
+      { id: 'utility-cabinet', name: 'Utility Area', image: utility3, options: [
+        { id: 'utility-basic', name: 'Basic', price: 34800, image: utility1, dimensions: `(60" (W) x 84" (H) = 35 sq ft)`},
+        { id: 'utility-standard', name: 'Standard', price: 49700, image: utility2, dimensions: `(84" (W) x 84" (H) = 49 sq ft)`},
+        { id: 'utility-premium', name: 'Premium', price: 74900, image: utility3, dimensions: `(96" (W) x 96" (H) = 64 sq ft)`},
+      ] }
+    ]
   },
+     
   {
     id: 'pooja-room',
     name: 'Pooja Room',
@@ -454,29 +522,29 @@ const categories: Category[] = [
       ] },
     ],
   },
-  {
-    id: 'home-office',
-    name: 'Office / Study Room',
-    image: homeoffice,
-    subcategories: [
-      { id: 'working-table', name: 'Working Table / Office Desk', image: logo },
-      { id: 'bookshelf', name: 'Bookshelf / Library Unit', image: logo },
-      { id: 'filing-cabinet', name: 'Filing Cabinet / Storage Drawers', image: logo },
-      { id: 'overhead-storage', name: 'Overhead Storage', image: logo },
-      { id: 'writing-board', name: 'Wall-mounted Writing Board / Pin Board', image: logo },
-    ],
-  },
-  {
-    id: 'balcony',
-    name: 'Balcony / Outdoor',
-    image: balcony,
-    subcategories: [
-      { id: 'seating-bench', name: 'Seating Bench with Storage', image: logo },
-      { id: 'garden-storage', name: 'Garden Storage Cabinet', image: logo },
-      { id: 'outdoor-shoe-rack', name: 'Outdoor Shoe Rack', image: logo },
-      { id: 'swing', name: 'Swing / Jhula (if applicable)', image: logo },
-    ],
-  },
+  // {
+  //   id: 'false-ceiling',
+  //   name: 'False Ceiling',
+  //   image: homeoffice,
+  //   subcategories: [
+  //     { id: 'working-table', name: 'Working Table / Office Desk', image: logo },
+  //     { id: 'bookshelf', name: 'Bookshelf / Library Unit', image: logo },
+  //     { id: 'filing-cabinet', name: 'Filing Cabinet / Storage Drawers', image: logo },
+  //     { id: 'overhead-storage', name: 'Overhead Storage', image: logo },
+  //     { id: 'writing-board', name: 'Wall-mounted Writing Board / Pin Board', image: logo },
+  //   ],
+  // },
+  // {
+  //   id: 'balcony',
+  //   name: 'Balcony / Outdoor',
+  //   image: balcony,
+  //   subcategories: [
+  //     { id: 'seating-bench', name: 'Seating Bench with Storage', image: logo },
+  //     { id: 'garden-storage', name: 'Garden Storage Cabinet', image: logo },
+  //     { id: 'outdoor-shoe-rack', name: 'Outdoor Shoe Rack', image: logo },
+  //     { id: 'swing', name: 'Swing / Jhula (if applicable)', image: logo },
+  //   ],
+  // },
   // {
   //   id: 'common-areas',
   //   name: 'Common Areas / Passage',
@@ -489,18 +557,35 @@ const categories: Category[] = [
   //     { id: 'wall-mounted-display', name: 'Wall-mounted Display Unit', image: logo },
   //   ],
   // },
+    // mk
   {
     id: 'optional-addons',
     name: 'Optional Add-Ons',
     image: options,
     subcategories: [
-      { id: 'false-ceiling', name: 'False Ceiling (Wooden Design)', image: logo },
-      { id: 'wooden-panelling', name: 'Wooden Wall Panelling / Fluted Panels', image: logo },
-      { id: 'decorative-moulding', name: 'Decorative Moulding / Cornices', image: logo },
-      { id: 'edge-banding', name: 'Edge Banding, Pasting & Cutting (if factory-made)', image: logo },
-      { id: 'hardware-accessories', name: 'Hardware Accessories (handles, hinges, locks)', image: logo },
-      { id: 'mirror-panels', name: 'Mirror Panels', image: logo },
-      { id: 'skirting', name: 'Skirting / Floor Beading', image: logo },
+      { id: 'false-ceiling', name: 'False Ceiling', image: ceiling3, options: [
+        { id: 'false-ceiling-basic', name: '1 BHK', price:  65000, image: ceiling1, dimensions: `(as Per Design Selection`},
+        { id: 'false-ceiling-standard', name: '2 BHK', price: 97000, image: ceiling2, dimensions: `(as Per Design Selection`},
+        { id: 'false-ceiling-premium', name: '3 BHK', price: 132000, image: ceiling3, dimensions: `(as Per Design Selection`},
+      ] },
+      { id: 'curtains', name: 'Curtains', image: curtains3, options: [
+        { id: 'curtains-basic', name: '1 BHK', price:  48950, image: curtains1, dimensions: `(as Per Design Selection`},
+        { id: 'curtains-standard', name: '2 BHK', price: 73800, image: curtains2, dimensions: `(as Per Design Selection`},
+        { id: 'curtains-premium', name: '3 BHK', price: 94500, image: curtains3, dimensions: `(as Per Design Selection`},
+      ] },
+      { id: 'mirror-panels', name: 'LED Mirror Panels', image: mirror3, options: [
+        { id: 'mirror-panels-basic', name: '1 BHK', price:  17400, image: mirror1, dimensions: `(as Per Design Selection`},
+        { id: 'mirror-panels-standard', name: '2 BHK', price: 28400, image: mirror2, dimensions: `(as Per Design Selection`},
+        { id: 'mirror-panels-premium', name: '3 BHK', price: 97400, image: mirror3, dimensions: `(as Per Design Selection`},
+      ] },
+      { id: 'Wallpapers', name: 'Custimized Wallpapers', image: wallpaper3, options: [
+        { id: 'Wallpapers-basic', name: '1 BHK', price:  26900, image: wallpaper1, dimensions: `(as Per Design Selection`},
+        { id: 'Wallpapers-standard', name: '2 BHK', price: 47200, image: wallpaper2, dimensions: `(as Per Design Selection`},
+        { id: 'Wallpapers-premium', name: '3 BHK', price: 68500, image: wallpaper3, dimensions: `(as Per Design Selection`},
+      ] },
+      // { id: 'edge-banding', name: 'Chindliers', image: logo },
+      // { id: 'hardware-accessories', name: 'Hardware Accessories (handles, hinges, locks)', image: logo },
+      // { id: 'skirting', name: 'Skirting / Floor Beading', image: logo },
     ],
   },
 ];
@@ -531,8 +616,8 @@ function Card({ image, selected, onClick }: CardProps) {
       animate={selected ? { scale: 1.08, boxShadow: '0 6px 24px 0 rgba(163,120,86,0.18)', borderColor: '#a37856' } : { scale: 1, boxShadow: 'none', borderColor: '#e5e7eb' }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       className={`relative w-32 h-32 border-2 rounded-xl flex flex-col overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary-400/60
-        ${selected
-          ? 'border-primary-600 ring-2 ring-primary-400/50 shadow-lg bg-primary-50/80 hover:bg-primary-50'
+        ${selected 
+          ? 'border-primary-600 ring-2 ring-primary-400/50 shadow-lg bg-primary-50/80 hover:bg-primary-50' 
           : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'}`}
       tabIndex={0}
       onClick={handleRipple}
@@ -650,13 +735,13 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
             );
             if (subcategory && subcategory.options) {
               const option = subcategory.options.find((o) => o.id === optionId);
-              if (option) {
+        if (option) {
                 answers.push({
                   questionId: `${category.name} - ${subcategory.name}`,
                   answer: option.name,
                   value: option.price,
                 });
-                total += option.price;
+          total += option.price;
               }
             }
           });
@@ -864,7 +949,7 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
                         transition={{ duration: 0.4 }}
-                        className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto flex flex-col md:flex-row gap-4 justify-center items-stretch mt-4 mb-4"
+                        className="flex flex-row justify-center items-stretch gap-6 w-full py-2"
                         style={{ position: 'static', zIndex: 'auto' }}
                       >
                         {sub.options.map((opt) => {
@@ -875,25 +960,22 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
                               whileTap={{ scale: 0.97 }}
                               animate={isSelected ? { scale: 1.04, boxShadow: '0 4px 16px 0 rgba(163,120,86,0.13)', borderColor: '#a37856', backgroundColor: '#f7ede3' } : { scale: 1, boxShadow: 'none', borderColor: '#e5e7eb', backgroundColor: '#fff' }}
                               transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                              className={`relative overflow-hidden w-full md:flex-1 min-w-0 md:min-w-[8rem] md:max-w-[10rem] flex-shrink-0 flex flex-col items-center justify-start rounded-xl border-2 cursor-pointer select-none transition-all duration-300 shadow-sm text-center ${isSelected ? 'border-primary-600 bg-primary-50' : 'bg-white border-gray-200 text-gray-800 hover:border-primary-400 hover:bg-primary-50'}`}
-                              style={{ minHeight: '10rem' }}
+                              className={`flex-1 max-w-xs bg-white border rounded-2xl shadow-lg px-4 py-5 flex flex-col items-center justify-start text-center gap-3 cursor-pointer select-none transition-all duration-300 ${isSelected ? 'border-primary-600 bg-primary-50' : 'border-gray-200 hover:border-primary-400 hover:bg-primary-50'}`}
+                              style={{ minHeight: '16rem' }}
                               onClick={() => handleOptionSelect(currentMainCat.id, sub.id, opt.id)}
                               tabIndex={0}
                               onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleOptionSelect(currentMainCat.id, sub.id, opt.id)}
                               aria-pressed={isSelected}
                               role="button"
                             >
-                              <div className="w-full aspect-square">
+                              <div className="w-20 h-20 mb-2 flex items-center justify-center rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-gray-50">
                                 <img src={opt.image} alt={opt.name} className="w-full h-full object-cover" />
                               </div>
-                              <div className="py-2 px-1 flex-grow flex flex-col justify-center">
-                                <span className="font-semibold text-sm" style={{ color: isSelected ? '#a37856' : '#a37856' }}>{opt.name}</span>
-                                <div className="w-8 h-0.5 bg-primary-200 my-1 mx-auto rounded-full" />
-                                <span className="text-base font-bold" style={{ color: isSelected ? '#a37856' : '#a37856' }}>₹{opt.price}</span>
-                                {opt.dimensions && (
-                                  <span className="text-xs text-gray-500 mt-1 px-1">{opt.dimensions}</span>
-                                )}
-                              </div>
+                              <span className="font-semibold text-base text-gray-900" style={{ color: isSelected ? '#a37856' : undefined }}>{opt.name}</span>
+                              <span className="text-xl font-bold text-primary-700" style={{ color: isSelected ? '#a37856' : undefined }}>₹{opt.price}</span>
+                              {opt.dimensions && (
+                                <span className="text-xs text-gray-500 mt-1 px-1 whitespace-pre-line">{opt.dimensions}</span>
+                              )}
                               {isSelected && (
                                 <span className="absolute bottom-2 right-2 text-primary-600">
                                   <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" stroke="#a37856" strokeWidth="2" fill="#fff"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke="#a37856" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>

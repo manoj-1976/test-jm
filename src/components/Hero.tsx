@@ -113,14 +113,14 @@ const Hero: React.FC = () => {
             style={{ height: '0.8em' }}
           />
         </motion.h2>
-        <motion.button
+            <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => navigate('/estimate')}
           className="px-8 py-3 rounded-full bg-yellow-600 text-white font-semibold text-lg shadow-lg hover:bg-yellow-700 transition mb-4"
-        >
+            >
           Get Estimate
-        </motion.button>
+            </motion.button>
         <div className="mt-8 grid grid-cols-2 gap-6 max-w-md mx-auto w-full">
           <div className="bg-black/40 p-4 rounded-lg text-center">
             <span className="block text-3xl font-semibold text-white mb-1 flex justify-center">
