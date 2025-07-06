@@ -150,6 +150,7 @@ interface CardProps {
   selected: boolean;
   onClick: () => void;
   price?: number;
+  dimensions?: string;
 }
 
 interface QuestionFlowProps {
@@ -664,6 +665,13 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
   const [activeSubcatId, setActiveSubcatId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Scroll to top on step/page change or mainCatIdx change during step 2
+  useEffect(() => {
+    if (step === 2) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [step, mainCatIdx]);
+
   // Step 1: Select main categories
   const handleCategorySelect = (catId: string) => {
     setSelectedCategories((prev: string[]) =>
@@ -740,6 +748,7 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
                   questionId: `${category.name} - ${subcategory.name}`,
                   answer: option.name,
                   value: option.price,
+                  dimensions: option.dimensions || '',
                 });
           total += option.price;
               }
@@ -817,8 +826,78 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
     return subcats.length > 0 && subcats.every(subId => selectedOptions[catId]?.[subId]);
   });
   
+  // --- Floating summary state ---
+  // Collect all selected options for the current step
+  const selectedOptionObjects: { label: string; price: number; id: string }[] = [];
+  selectedCategories.forEach(catId => {
+    const cat = categories.find(c => c.id === catId);
+    if (!cat) return;
+    const subcats = selectedSubcategories[catId] || [];
+    subcats.forEach(subId => {
+      const sub = cat.subcategories.find(s => s.id === subId);
+      if (!sub || !selectedOptions[catId]?.[subId]) return;
+      const optId = selectedOptions[catId][subId];
+      const opt = sub.options?.find(o => o.id === optId);
+      if (opt) {
+        selectedOptionObjects.push({
+          label: `${cat.name} - ${sub.name}: ${opt.name}`,
+          price: opt.price,
+          id: `${catId}-${subId}`,
+        });
+      }
+    });
+  });
+  const runningTotal = selectedOptionObjects.reduce((sum, o) => sum + o.price, 0);
+
+  // --- Floating summary component ---
+  const FloatingSummary = () => {
+    // Show only the latest 2 selected items (most recent at the top)
+    const latestItems = [...selectedOptionObjects].slice(-2).reverse();
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className="fixed top-4 right-4 z-50 w-72 max-w-[95vw] bg-white/60 backdrop-blur-md shadow-2xl rounded-2xl border border-primary-200 px-5 py-4 flex flex-col gap-3"
+        style={{ pointerEvents: 'auto' }}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-bold text-primary-900 text-lg tracking-wide">Selected</span>
+          <span className="font-bold text-primary-700 text-2xl drop-shadow">₹{runningTotal.toLocaleString()}</span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <AnimatePresence>
+            {latestItems.map((item, idx) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, x: 40, scale: 0.8 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 40, scale: 0.8 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                className="flex items-center justify-between bg-white/80 rounded-xl px-3 py-2 shadow border border-primary-100"
+                style={{ backdropFilter: 'blur(4px)' }}
+              >
+                <span className="text-xs font-semibold text-primary-900 truncate max-w-[120px]">{item.label}</span>
+                <span className="text-base font-bold text-primary-700 ml-2">₹{item.price.toLocaleString()}</span>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+    );
+  };
+
+  // Helper for blurred price
+  const BlurredPrice = ({ price }: { price: number }) => (
+    <span className="inline-block mx-1 px-2 py-0.5 rounded bg-gray-100 text-gray-400 font-bold text-sm" style={{ filter: 'blur(3px)' }}>
+      ₹{price.toLocaleString()}
+    </span>
+  );
+
   return (
-    <motion.div ref={containerRef} className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+    <motion.div ref={containerRef} className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-lg relative">
+      {/* Floating summary always visible on step 2 */}
+      {step === 2 && <FloatingSummary />}
       {step === 1 && (
         <div>
           <h2 className="text-2xl text-center font-serif font-semibold mb-6 text-gray-800">Shape Your Space - "Pick the Rooms You Want Interiors For"</h2>
@@ -907,110 +986,139 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
           {selectedSubcats.length === 0 ? (
             <div className="mb-6 text-gray-600">Select at least one subcategory to continue.</div>
           ) : null}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 p-2 sm:p-4 md:p-6 mb-8">
+          {/* Subcategory grid */}
+          <div className="flex flex-col gap-4 mb-8">
             {currentMainCat.subcategories.map((sub) => {
               const isSelected = selectedSubcats.includes(sub.id);
               const isTrulySelected = isSelected && !!selectedOptions[currentMainCat.id]?.[sub.id];
               const isActive = activeSubcatId === sub.id;
               const hasProduct = !!selectedOptions[currentMainCat.id]?.[sub.id];
               const shouldBlur = activeSubcatId && !hasProduct && !isActive;
+              // Get 3 blurred prices
+              const prices = (sub.options || []).slice(0, 3).map(o => o.price);
+              // Get selected option id for this subcat
+              const selectedOptId = selectedOptions[currentMainCat.id]?.[sub.id];
               return (
-                <div key={sub.id} className="flex flex-col items-center justify-start w-full">
-                  <motion.div
-                    whileTap={{ scale: 0.96 }}
-                    animate={isTrulySelected ? { scale: 1.08, boxShadow: '0 6px 24px 0 rgba(163,120,86,0.18)', borderColor: '#a37856' } : { scale: 1, boxShadow: 'none', borderColor: '#e5e7eb' }}
-                    whileHover={{ y: -6, boxShadow: '0 8px 32px 0 rgba(163,120,86,0.12)' }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                    className={`relative w-full transition-all duration-300 ${shouldBlur ? 'blur-sm opacity-50 pointer-events-none' : ''}`}
-                    onClick={() => {
-                      if (selectedSubcats.includes(sub.id)) {
-                         if (isActive) setActiveSubcatId(null);
-                         else setActiveSubcatId(sub.id);
-                      } else {
-                         handleSubcategorySelect(currentMainCat.id, sub.id);
-                         setActiveSubcatId(sub.id);
-                      }
-                    }}
-                  >
-                    <Card
-                      image={sub.image}
-                      title={sub.name}
-                      selected={isTrulySelected}
-                      onClick={() => {}}
-                    />
-                    <span className="mt-2 text-sm font-bold text-center" style={{ color: 'rgb(164, 120, 100)', display: 'block' }}>
-                      {sub.name}
-                    </span>
-                  </motion.div>
-                  <AnimatePresence>
-                    {isActive && sub.options && sub.options.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        transition={{ duration: 0.4 }}
-                        className="flex flex-row justify-center items-stretch gap-6 w-full py-2"
-                        style={{ position: 'static', zIndex: 'auto' }}
-                      >
-                        {sub.options.map((opt) => {
-                          const isSelected = selectedOptions[currentMainCat.id]?.[sub.id] === opt.id;
-                          return (
-                            <motion.div
-                              key={opt.id}
-                              whileTap={{ scale: 0.97 }}
-                              animate={isSelected ? { scale: 1.04, boxShadow: '0 4px 16px 0 rgba(163,120,86,0.13)', borderColor: '#a37856', backgroundColor: '#f7ede3' } : { scale: 1, boxShadow: 'none', borderColor: '#e5e7eb', backgroundColor: '#fff' }}
-                              transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                              className={`flex-1 max-w-xs bg-white border rounded-2xl shadow-lg px-4 py-5 flex flex-col items-center justify-start text-center gap-3 cursor-pointer select-none transition-all duration-300 ${isSelected ? 'border-primary-600 bg-primary-50' : 'border-gray-200 hover:border-primary-400 hover:bg-primary-50'}`}
-                              style={{ minHeight: '16rem' }}
-                              onClick={() => handleOptionSelect(currentMainCat.id, sub.id, opt.id)}
-                              tabIndex={0}
-                              onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleOptionSelect(currentMainCat.id, sub.id, opt.id)}
-                              aria-pressed={isSelected}
-                              role="button"
-                            >
-                              <div className="w-20 h-20 mb-2 flex items-center justify-center rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-gray-50">
-                                <img src={opt.image} alt={opt.name} className="w-full h-full object-cover" />
-                              </div>
-                              <span className="font-semibold text-base text-gray-900" style={{ color: isSelected ? '#a37856' : undefined }}>{opt.name}</span>
-                              <span className="text-xl font-bold text-primary-700" style={{ color: isSelected ? '#a37856' : undefined }}>₹{opt.price}</span>
-                              {opt.dimensions && (
-                                <span className="text-xs text-gray-500 mt-1 px-1 whitespace-pre-line">{opt.dimensions}</span>
-                              )}
-                              {isSelected && (
-                                <span className="absolute bottom-2 right-2 text-primary-600">
-                                  <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" stroke="#a37856" strokeWidth="2" fill="#fff"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke="#a37856" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                                </span>
-                              )}
-                            </motion.div>
-                          );
-                        })}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                  {hasProduct && !isActive && selectedOptions[currentMainCat.id]?.[sub.id] && (
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      className="flex items-center justify-between text-white text-lg text-center mt-2 font-bold rounded-xl px-6 py-3 shadow-md"
-                      style={{ width: '100%', background: 'rgb(163 120 86)' }}
+                <div key={sub.id} className={`relative ${!isSelected ? 'flex flex-row items-center' : 'flex flex-col items-center'} bg-white border-2 ${isSelected ? 'border-primary-600' : 'border-gray-200'} rounded-xl shadow-md px-2 py-2 transition-all duration-300 cursor-pointer hover:border-primary-400 ${shouldBlur ? 'blur-sm opacity-50 pointer-events-none' : ''}`}
+                  onClick={() => {
+                    if (isSelected) {
+                      if (isActive) setActiveSubcatId(null);
+                      else setActiveSubcatId(sub.id);
+                    } else {
+                      handleSubcategorySelect(currentMainCat.id, sub.id);
+                      setActiveSubcatId(sub.id);
+                    }
+                  }}
+                  style={{ minHeight: '90px', position: 'relative' }}
+                >
+                  {/* Red X for deselect */}
+                  {isSelected && (
+                    <button
+                      className="absolute -top-2 -left-2 bg-white rounded-full border border-red-200 p-1 z-20 hover:bg-red-100"
+                      onClick={e => { e.stopPropagation(); handleSubcategorySelect(currentMainCat.id, sub.id); }}
+                      tabIndex={0}
+                      aria-label="Deselect"
                     >
-                      <span className="flex-1 text-left">
-                        {(() => {
-                          const optionId = selectedOptions[currentMainCat.id]?.[sub.id];
-                          const opt = sub.options?.find(o => o.id === optionId);
-                          return opt ? `${opt.name} - ₹${opt.price}` : '';
-                        })()}
-                      </span>
-                    </motion.div>
+                      <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" fill="#fff" stroke="#e3342f" strokeWidth="2"/><path d="M7 7l6 6M13 7l-6 6" stroke="#e3342f" strokeWidth="2" strokeLinecap="round"/></svg>
+                    </button>
+                  )}
+                  {/* Layout for NOT selected: image left 40%, name right 60% with animation */}
+                  {!isSelected && (
+                    <>
+                      <div className="flex-shrink-0 w-[40%] h-20 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
+                        <img src={sub.image} alt={sub.name} className="w-full h-full object-cover" />
+                      </div>
+                      <motion.div
+                        className="flex flex-col w-[60%] items-center justify-center px-2"
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                      >
+                        <span className="font-bold text-base text-primary-900 text-center w-full">{sub.name}</span>
+                      </motion.div>
+                    </>
+                  )}
+                  {/* Layout for selected: revert to previous (image above, name below, or as before) */}
+                  {isSelected && (
+                    <div className="flex flex-col flex-1 w-full items-center justify-center">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center mb-1">
+                        <img src={sub.image} alt={sub.name} className="w-full h-full object-cover" />
+                      </div>
+                      <motion.span
+                        className="font-bold text-base text-primary-900 text-center mb-1 w-full"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                      >
+                        {sub.name}
+                      </motion.span>
+                      {/* Show selected product details or blurred prices */}
+                      {selectedOptId ? (
+                        (() => {
+                          const selectedOpt = (sub.options || []).find(o => o.id === selectedOptId);
+                          return selectedOpt ? (
+                            <div className="flex flex-row items-center gap-2 mt-1 mb-1">
+                              <span className="font-semibold text-primary-700 text-base">{selectedOpt.name}</span>
+                              <span className="font-bold text-primary-900 text-lg">- ₹{selectedOpt.price.toLocaleString('en-IN')}</span>
+                            </div>
+                          ) : null;
+                        })()
+                      ) : null}
+                      {/* Product options (show only if active) */}
+                      <AnimatePresence>
+                        {isActive && sub.options && sub.options.length > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            transition={{ duration: 0.4 }}
+                            className="flex flex-row gap-3 w-full justify-center items-stretch mt-2"
+                          >
+                            {sub.options.map((opt) => {
+                              const isOptSelected = selectedOptId === opt.id;
+                              return (
+                                <motion.div
+                                  key={opt.id}
+                                  whileTap={{ scale: 0.97 }}
+                                  animate={isOptSelected ? { scale: 1.04, boxShadow: '0 4px 16px 0 rgba(163,120,86,0.13)', borderColor: '#a37856', backgroundColor: '#f7ede3' } : { scale: 1, boxShadow: 'none', borderColor: '#e5e7eb', backgroundColor: '#fff' }}
+                                  transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+                                  className={`flex-1 min-w-0 bg-white border rounded-2xl shadow px-2 py-3 flex flex-col items-center justify-start text-center gap-2 cursor-pointer select-none transition-all duration-300 relative ${isOptSelected ? 'border-primary-600 bg-primary-50' : 'border-gray-200 hover:border-primary-400 hover:bg-primary-50'}`}
+                                  style={{ minHeight: '8rem', maxWidth: '110px' }}
+                                  onClick={e => { e.stopPropagation(); handleOptionSelect(currentMainCat.id, sub.id, opt.id); }}
+                                  tabIndex={0}
+                                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleOptionSelect(currentMainCat.id, sub.id, opt.id)}
+                                  aria-pressed={isOptSelected}
+                                  role="button"
+                                >
+                                  <div className="w-12 h-12 mb-1 flex items-center justify-center rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-gray-50 mx-auto">
+                                    <img src={opt.image} alt={opt.name} className="w-full h-full object-cover" />
+                                  </div>
+                                  <span className="font-semibold text-xs text-gray-900" style={{ color: isOptSelected ? '#a37856' : undefined }}>{opt.name}</span>
+                                  <span className="text-base font-bold text-primary-700" style={{ color: isOptSelected ? '#a37856' : undefined }}>₹{opt.price.toLocaleString('en-IN')}</span>
+                                  {opt.dimensions && (
+                                    <span className="text-[10px] text-gray-500 mt-1 px-1 whitespace-pre-line">{opt.dimensions}</span>
+                                  )}
+                                  {isOptSelected && (
+                                    <span className="absolute bottom-2 right-2 text-primary-600">
+                                      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" stroke="#a37856" strokeWidth="2" fill="#fff"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke="#a37856" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                    </span>
+                                  )}
+                                </motion.div>
+                              );
+                            })}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   )}
                 </div>
               );
             })}
           </div>
           <div className="flex justify-between items-center mt-8">
+            {/* Back button with previous category name */}
             <button
-              className="px-8 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-200 transition-colors"
+              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-200 transition-colors flex items-center gap-2"
               onClick={() => {
                 setActiveSubcatId(null);
                 if (subCatIdx > 0) setSubCatIdx(subCatIdx - 1);
@@ -1023,10 +1131,12 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
               }}
               disabled={mainCatIdx === 0 && subCatIdx === 0}
             >
-              Back
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke="#a37856" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              {mainCatIdx > 0 ? `Back to ${categories.find(c => c.id === selectedCategories[mainCatIdx - 1])?.name || 'Previous'}` : 'Back'}
             </button>
+            {/* Next button with next category name */}
             <button
-              className="px-8 py-3 bg-primary-600 text-white rounded-xl font-medium shadow-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 bg-primary-600 text-white rounded-xl font-medium shadow-md hover:bg-primary-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={selectedSubcats.length === 0 || !selectedSubcats.every(subId => selectedOptions[currentMainCat.id]?.[subId])}
               onClick={() => {
                 setActiveSubcatId(null);
@@ -1038,7 +1148,8 @@ const QuestionFlow = ({ onComplete }: QuestionFlowProps) => {
                 }
               }}
             >
-              {mainCatIdx < selectedCategories.length - 1 ? 'Next Category' : 'Finish'}
+              {mainCatIdx < selectedCategories.length - 1 ? `Next: ${categories.find(c => c.id === selectedCategories[mainCatIdx + 1])?.name || 'Next'}` : 'Finish'}
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
           </div>
         </div>

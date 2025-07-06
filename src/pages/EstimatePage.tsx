@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import EstimateHeader from '../components/estimate/EstimateHeader';
 import PersonalDetailsForm from '../components/estimate/PersonalDetailsForm';
 import QuestionFlow from '../components/estimate/QuestionFlow';
 import EstimateResult from '../components/estimate/EstimateResult';
 import Footer from '../components/Footer';
+import { BASE_URL } from '../components/api/api.tsx';
+
 
 export type PersonalDetails = {
   fullName: string;
@@ -18,6 +21,7 @@ export type AnswerData = {
   questionId: string;
   answer: string;
   value: number;
+  dimensions?: string;
 };
 
 const EstimatePage = () => {
@@ -32,10 +36,30 @@ const EstimatePage = () => {
   const [answers, setAnswers] = useState<AnswerData[]>([]);
   const [estimateTotal, setEstimateTotal] = useState(0);
 
-  const handlePersonalDetailsSubmit = (details: PersonalDetails) => {
-    setPersonalDetails(details);
-    setStep('questions');
-    window.scrollTo(0, 0);
+  const handlePersonalDetailsSubmit = async (details: PersonalDetails) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/details`, {
+        fullName: details.fullName,
+        email: details.email,
+        phone: details.phone,
+        city: details.city,
+        address: details.address,
+      });
+      // save the id to the local storage
+      if (response.status == 200 ) {
+          localStorage.setItem('id', response.data.Id);
+      } else {
+        throw new Error('Failed to save details');
+      }
+      setPersonalDetails(details);
+      setStep('questions');
+      window.scrollTo(0, 0);
+    } catch (error) {
+      setPersonalDetails(details);
+      setStep('questions');
+      window.scrollTo(0, 0);
+      // alert('Failed to save your details. Please try again.');
+    }
   };
 
   const handleQuestionsComplete = (answers: AnswerData[], total: number) => {
